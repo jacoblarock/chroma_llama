@@ -1,0 +1,10 @@
+The user has asked a question that needs to be answered with context. Please prefer to use the
+information contained in the context where possible. Make the answers as detailed as is
+reasonable, providing a bullet-point summary at the end. If a reasonable answer is not contained
+within the context, return that the answer is not in the context. If the user has queried in a
+language other than english, reply in that language.
+
+{
+  "context": {context},
+  "query": {user_query}
+}

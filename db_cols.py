@@ -2,9 +2,6 @@ import chromadb
 from chromadb.api import ClientAPI
 from glob import glob
 import re
-from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
-
-ef = ONNXMiniLM_L6_V2(preferred_providers=['CUDAExecutionProvider'])
 
 def load_client(path: str) -> ClientAPI:
     return chromadb.PersistentClient(path)
@@ -20,8 +17,13 @@ def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
         if ext in ["txt"]:
             print("processing", path)
             with open(path) as file:
-                chunks = re.findall(".{1," + str(chunk_size) + "}", file.read())
-            del file
+                chunks = []
+                text = file.read()
+                for start in range(0, len(text), chunk_size):
+                    end = start + chunk_size
+                    if end > len(text):
+                        end = -1
+                    chunks.append(text[start:end])
             for i in range(len(chunks)):
                 docs.append(chunks[i])
                 names.append(name + str(i))
@@ -33,11 +35,11 @@ def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
 
 def query(col: chromadb.Collection,texts: list[str]):
     result = col.query(
-        query_texts=texts
+        query_texts=texts, n_results=10
     )
     return result["documents"]
 
 if __name__ == "__main__":
     client = load_client("client")
-    col = client.get_or_create_collection("test", embedding_function=ef)
-    add_to_collection(col, "test_data/", 1000)
+    col = client.get_or_create_collection("test")
+    add_to_collection(col, "test_data/", 2000)
