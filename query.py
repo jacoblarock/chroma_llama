@@ -31,7 +31,7 @@ def answer_with_context(query: str, context: list | None):
             "content": prompt
         }],
         options={
-            "num_ctx": 65536
+            "num_ctx": 32768
         }
     )
     return response.message.content

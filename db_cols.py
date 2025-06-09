@@ -1,10 +1,20 @@
 import chromadb
 from chromadb.api import ClientAPI
 from glob import glob
-import re
+from aspose.pdf import Document
+from aspose.pdf.text import TextAbsorber
 
 def load_client(path: str) -> ClientAPI:
     return chromadb.PersistentClient(path)
+
+def chunk_text(text: str, chunk_size: int) -> list[str]:
+    chunks = []
+    for start in range(0, len(text), chunk_size - 20):
+        end = start + chunk_size
+        if end > len(text):
+            end = -1
+        chunks.append(text[start:end])
+    return chunks
 
 def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
     base_dir = base_dir[:-1] if base_dir[-1] == "/" else base_dir
@@ -14,16 +24,18 @@ def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
         names = []
         ext = path.split(".")[-1]
         name = path.split("/")[-1].split(".")[0]
-        if ext in ["txt"]:
-            print("processing", path)
-            with open(path) as file:
-                chunks = []
+        text = None
+        if ext == "txt":
+            with open(path, "r") as file:
                 text = file.read()
-                for start in range(0, len(text), chunk_size - 20):
-                    end = start + chunk_size
-                    if end > len(text):
-                        end = -1
-                    chunks.append(text[start:end])
+        if ext == "pdf":
+            document = Document(path)
+            text_abs = TextAbsorber()
+            document.pages.accept(text_abs)
+            text = text_abs.text
+        if text:
+            chunks = chunk_text(text, chunk_size)
+            print("processing", path)
             for i in range(len(chunks)):
                 docs.append(chunks[i])
                 names.append(name + str(i))
