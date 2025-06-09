@@ -29,7 +29,10 @@ def answer_with_context(query: str, context: list | None):
         messages=[{
             "role": "user",
             "content": prompt
-        }]
+        }],
+        options={
+            "num_ctx": 65536
+        }
     )
     return response.message.content
 
@@ -40,6 +43,7 @@ if __name__ == "__main__":
     client = db_cols.load_client("client")
     col = client.get_collection("test")
     context = db_cols.query(col, keywords)
+    print(len(str(context)))
     answer = answer_with_context(query, context)
     print(answer)
 

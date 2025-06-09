@@ -19,7 +19,7 @@ def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
             with open(path) as file:
                 chunks = []
                 text = file.read()
-                for start in range(0, len(text), chunk_size):
+                for start in range(0, len(text), chunk_size - 20):
                     end = start + chunk_size
                     if end > len(text):
                         end = -1
@@ -33,9 +33,9 @@ def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
                 documents=docs,
             )
 
-def query(col: chromadb.Collection,texts: list[str]):
+def query(col: chromadb.Collection,texts: list[str]) -> list[list[str]] | None:
     result = col.query(
-        query_texts=texts, n_results=10
+        query_texts=texts, n_results=3
     )
     return result["documents"]
 
