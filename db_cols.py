@@ -2,34 +2,39 @@ import chromadb
 from chromadb.api import ClientAPI
 from glob import glob
 from pypdf import PdfReader
+from pypdf.errors import EmptyFileError
 import argparse
 
 def load_client(path: str) -> ClientAPI:
     return chromadb.PersistentClient(path)
 
 def chunk_text(text: str, chunk_size: int) -> list[str]:
+    split_str = text.split(" ")
     chunks = []
-    for start in range(0, len(text), chunk_size - 20):
+    for start in range(0, len(split_str), chunk_size):
         end = start + chunk_size
-        if end > len(text):
+        if end > len(split_str):
             end = -1
-        chunks.append(text[start:end])
+        chunks.append(" ".join(split_str[start:end]))
     return chunks
 
 def add_to_collection(col: chromadb.Collection, base_dir: str, chunk_size: int):
     base_dir = base_dir[:-1] if base_dir[-1] == "/" else base_dir
-    paths = glob(f"{base_dir}/**/*") + glob(f"{base_dir}/*")
+    paths = glob(f"{base_dir}/**/*", recursive=True)
     for path in paths:
         docs = []
         names = []
         ext = path.split(".")[-1]
         name = path.split("/")[-1].split(".")[0]
         text = None
-        if ext == "txt":
+        if ext in ["txt", "tex"]:
             with open(path, "r") as file:
                 text = file.read()
         if ext == "pdf":
-            reader = PdfReader(path)
+            try:
+                reader = PdfReader(path)
+            except EmptyFileError:
+                pass
             text = ""
             for page in reader.pages:
                 text += page.extract_text()
@@ -62,4 +67,4 @@ if __name__ == "__main__":
         name = "default"
     client = load_client("client")
     col = client.get_or_create_collection("default")
-    add_to_collection(col, args.path, 2000)
+    add_to_collection(col, args.path, 400)

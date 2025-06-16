@@ -1,7 +1,7 @@
 # Chroma_Llama
 This repository is my playground for experimenting with document querying for processing with
 LLMs. The ChromaDB is used as an embedding database and the ONNXMiniLM_L6_V2 model for embedding.
-LLM queries are performed with Ollama.
+LLM queries are performed with Ollama or Deepseek.
 
 ## Structure
 - prompts: directory for prompt storage

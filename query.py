@@ -3,6 +3,7 @@ import json
 import db_cols
 
 model = "llama3.1:8b"
+# model = "deepseek-r1:7b"
 
 def get_context_needed(query: str) -> list[str]:
     with open("prompts/additional_context") as file:
@@ -53,6 +54,5 @@ if __name__ == "__main__":
     client = db_cols.load_client("client")
     col = client.get_collection("default")
     context = db_cols.query(col, keywords)
-    print(len(str(context)))
     answer = answer_with_context(query, context, print_stream=True)
     print(answer)
