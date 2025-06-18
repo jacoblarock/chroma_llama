@@ -10,3 +10,11 @@ LLM queries are performed with Ollama or Deepseek.
     instructions.
 - db_cols: database collection management including document digestion.
 - query: user query pipeline.
+
+## The Pipeline
+The pipeline for document query and answering has the following steps:
+- LLM is given the user's query and asked what search phrases could be used to search for context.
+  - The answer is given back in an array and stored.
+- Database is queried with each of the phrases returned by the first query.
+  - The nearest result for each query is stored stored in a list.
+- The result of the previous is given in a structured format with the user query back to the LLM ans the LLM is instructed to answer the user query given the found context.
