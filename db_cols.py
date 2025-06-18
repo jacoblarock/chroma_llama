@@ -11,7 +11,7 @@ def load_client(path: str) -> ClientAPI:
 def chunk_text(text: str, chunk_size: int) -> list[str]:
     split_str = text.split(" ")
     chunks = []
-    for start in range(0, len(split_str), chunk_size):
+    for start in range(0, len(split_str), chunk_size - chunk_size // 10):
         end = start + chunk_size
         if end > len(split_str):
             end = -1
